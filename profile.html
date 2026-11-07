@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — JONG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-body">
+  <div class="stars"></div>
+  <div class="stars2"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">JONG</div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard">📊 Dashboard</a>
+      <a href="/profile" class="active">👤 My Profile</a>
+      <a href="/logout" class="logout-link">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <h1>Your Profile</h1>
+    <form method="post" action="/profile/update" class="profile-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" name="first_name" value="{{ user.first_name }}" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" name="last_name" value="{{ user.last_name }}" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" value="{{ user.username }}" required>
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea name="bio" rows="4">{{ user.bio }}</textarea>
+      </div>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </form>
+  </main>
+</body>
+</html>

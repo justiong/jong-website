@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — JONG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-body">
+  <div class="stars"></div>
+  <div class="stars2"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">JONG</div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="active">📊 Dashboard</a>
+      <a href="/profile">👤 My Profile</a>
+      <a href="/logout" class="logout-link">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <h1>Welcome, {{ user.first_name }}! ⚡</h1>
+    <p class="subtext">You are successfully logged in.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Username</h3>
+        <p class="stat-value">{{ user.username }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Email</h3>
+        <p class="stat-value">{{ user.email }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Member Since</h3>
+        <p class="stat-value">{{ user.created_at[:10] }}</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
