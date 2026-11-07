@@ -20,7 +20,9 @@ sessions = {}
 
 def get_current_user(request: Request):
     session_id = request.cookies.get("session_id")
-    return sessions.get(session_id) if session_id else None
+    if not session_id or session_id not in sessions:
+        return None
+    return sessions[session_id]
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -30,10 +32,10 @@ async def home(request: Request):
     )
 
 @app.get("/register", response_class=HTMLResponse)
-async def register_page(request: Request, error=None):
+async def register_page(request: Request, error: str = None, success: str = None):
     return templates.TemplateResponse(
         "register.html",
-        {"request": request, "error": error}
+        {"request": request, "error": error, "success": success}
     )
 
 @app.post("/register")
@@ -46,11 +48,17 @@ async def register_submit(
 ):
     ok, msg = register_user(username, email, password, full_name)
     if ok:
-        return RedirectResponse("/login", status_code=303)
-    return await register_page(request, error=msg)
+        return templates.TemplateResponse(
+            "register.html",
+            {"request": request, "success": msg}
+        )
+    return templates.TemplateResponse(
+        "register.html",
+        {"request": request, "error": msg}
+    )
 
 @app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request, error=None):
+async def login_page(request: Request, error: str = None):
     return templates.TemplateResponse(
         "login.html",
         {"request": request, "error": error}
@@ -69,39 +77,47 @@ async def login_submit(
         resp = RedirectResponse("/profile", status_code=303)
         resp.set_cookie("session_id", session_id, httponly=True)
         return resp
-    return await login_page(request, error=data)
+    return templates.TemplateResponse(
+        "login.html",
+        {"request": request, "error": data}
+    )
 
 @app.get("/profile", response_class=HTMLResponse)
-async def profile_page(request: Request):
+async def profile_page(request: Request, success: str = None):
     user_id = get_current_user(request)
     if not user_id:
-        return RedirectResponse("/login")
+        return RedirectResponse("/login", status_code=303)
+    user = get_user_profile(user_id)
     return templates.TemplateResponse(
         "profile.html",
-        {"request": request, "user": get_user_profile(user_id)}
+        {"request": request, "user": user, "success": success}
     )
 
 @app.post("/profile/update")
-async def profile_update(
+async def profile_update_submit(
     request: Request,
     full_name: str = Form(""),
     bio: str = Form("")
 ):
     user_id = get_current_user(request)
     if not user_id:
-        return RedirectResponse("/login")
-    update_profile(user_id, full_name, bio)
-    return RedirectResponse("/profile", status_code=303)
+        return RedirectResponse("/login", status_code=303)
+    ok, msg = update_profile(user_id, full_name, bio)
+    return templates.TemplateResponse(
+        "profile.html",
+        {"request": request, "user": get_user_profile(user_id), "success": msg}
+    )
 
 @app.get("/logout")
 async def logout(request: Request):
     session_id = request.cookies.get("session_id")
-    if session_id:
-        sessions.pop(session_id, None)
-    resp = RedirectResponse("/")
+    if session_id and session_id in sessions:
+        del sessions[session_id]
+    resp = RedirectResponse("/", status_code=303)
     resp.delete_cookie("session_id")
     return resp
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
