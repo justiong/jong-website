@@ -1,0 +1,7 @@
+# Don't upload database file
+jong_website.db
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
